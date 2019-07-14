@@ -1,5 +1,6 @@
 package gr.georgiopoulos.chessboard.ui.activity
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
@@ -96,8 +97,8 @@ class ChessboardActivity : AppCompatActivity() {
 
                             } else {
                                 showErrorDialog("Oups", "The knight can not reach end position in 3 steps", closeListener = MaterialDialog.SingleButtonCallback { materialDialog: MaterialDialog, dialogAction: DialogAction ->
-                                    materialDialog.dismiss()
                                     resetTarget()
+                                    materialDialog.dismiss()
                                 })
                             }
                         } else {
@@ -154,6 +155,7 @@ class ChessboardActivity : AppCompatActivity() {
         closeListener?.let {
             materialBuilder.positiveText(getString(android.R.string.ok))
             materialBuilder.onPositive(closeListener)
+            materialBuilder.positiveColor(Color.BLACK)
         }
 
         materialDialog?.dismiss()
