@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/actionBarSize"
+    android:background="@color/colorPrimary"
+    app:contentInsetEnd="@dimen/common_zero_dp"
+    app:contentInsetLeft="@dimen/common_zero_dp"
+    app:contentInsetRight="@dimen/common_zero_dp"
+    app:contentInsetStart="@dimen/common_zero_dp"
+    app:titleTextColor="@android:color/black">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/common_ten_dp"
+        android:layout_marginEnd="@dimen/common_ten_dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/closeImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/common_ten_dp"
+            android:src="@drawable/vector_close" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/toolbarTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/refreshImageView"
+            android:layout_toEndOf="@+id/closeImageView"
+            android:gravity="center_horizontal"
+            android:text="@string/app_name"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/common_text_eighteen_sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/refreshImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/common_ten_dp"
+            android:src="@drawable/vector_refresh" />
+
+    </RelativeLayout>
+</androidx.appcompat.widget.Toolbar>
