@@ -28,12 +28,14 @@ class ChessboardActivity : AppCompatActivity() {
     private var chessboard = Array(DEFAULT_DIMENSION) { arrayOfNulls<Tile>(DEFAULT_DIMENSION) }
     private var chessBoardDistance = DEFAULT_DIMENSION
     private var queue: Queue<Tile> = LinkedList()
+    private var isNotReachable: Boolean = true
     private var knightPos: Possition? = null
     private var targetPos: Possition? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        chessBoardDistance = intent?.getIntExtra(CHESS_DIMENSION, DEFAULT_DIMENSION) ?: DEFAULT_DIMENSION
+        chessBoardDistance = intent?.getIntExtra(CHESS_DIMENSION, DEFAULT_DIMENSION)
+                ?: DEFAULT_DIMENSION
         chessboard = Array(chessBoardDistance) { arrayOfNulls<Tile>(chessBoardDistance) }
         setContentView(R.layout.activity_chessboard)
         //Populate the chessboard with position values as unreachable
@@ -78,7 +80,7 @@ class ChessboardActivity : AppCompatActivity() {
 
                         //If this position is same as the end position, you found the destination
                         if (endTile.isEqual(tile)) {
-
+                            isNotReachable = false
                             if (tile.depth <= 3) {
 
                                 // We found the Position. Now trace back from this position to get the actual shortest path
@@ -100,7 +102,7 @@ class ChessboardActivity : AppCompatActivity() {
                             bfs(tile, ++tile.depth)
                         }
                     }
-                    if (tile.depth == Integer.MAX_VALUE) {
+                    if (isNotReachable) {
                         showErrorDialog(R.string.error_title, R.string.error_message_not_reachable) {}
                     }
                 }
@@ -114,6 +116,7 @@ class ChessboardActivity : AppCompatActivity() {
             chessboard = Array(chessBoardDistance) { arrayOfNulls<Tile>(chessBoardDistance) }
             populateChessBoard()
             queue = LinkedList()
+            isNotReachable = true
             targetPos = null
         }
     }
@@ -206,7 +209,7 @@ class ChessboardActivity : AppCompatActivity() {
     }
 
     private fun inRange(x: Int, y: Int): Boolean {
-        return x in 0 until chessBoardDistance-1 && 0 <= y && y < chessBoardDistance
+        return x in 0 until chessBoardDistance - 1 && 0 <= y && y < chessBoardDistance
     }
 
     /**
