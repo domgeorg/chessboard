@@ -1,4 +1,4 @@
-package gr.georgiopoulos.chessboard.ui.activity
+package gr.georgiopoulos.chessboard.ui.activity.chessboard
 
 import android.graphics.Color
 import android.os.Bundle
@@ -21,8 +21,11 @@ class ChessboardActivity : AppCompatActivity() {
         const val POST_DELAY_ANIMATION = 200L
     }
 
-    private var chessBoardDimension = DEFAULT_DIMENSION
-    private var chessboard = Array(DEFAULT_DIMENSION) { arrayOfNulls<Tile>(DEFAULT_DIMENSION) }
+    private var chessBoardDimension =
+        DEFAULT_DIMENSION
+    private var chessboard = Array(DEFAULT_DIMENSION) { arrayOfNulls<Tile>(
+        DEFAULT_DIMENSION
+    ) }
     private var queue: Queue<Tile> = LinkedList()
     private var materialDialog: MaterialDialog? = null
     private var knightPos: Possition? = null
@@ -88,11 +91,15 @@ class ChessboardActivity : AppCompatActivity() {
 
                                 Handler().postDelayed({
                                     chessBoardView?.movePiece(knightPath.reversed())
-                                }, POST_DELAY_ANIMATION)
+                                },
+                                    POST_DELAY_ANIMATION
+                                )
 
                                 Handler().postDelayed({
                                     resetTarget()
-                                }, POST_DELAY_ANIMATION)
+                                },
+                                    POST_DELAY_ANIMATION
+                                )
 
 
                             } else {
