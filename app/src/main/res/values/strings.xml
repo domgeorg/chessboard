@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">chessboard</string>
+    <string name="error_title">Oups</string>
+    <string name="select_dimension_title">Select Chessboard Dimension</string>
+    <string name="error_message_steps">The knight can not reach end position in 3 steps</string>
+    <string name="error_message_not_reachable">End position is not reachable for the knight</string>
 </resources>

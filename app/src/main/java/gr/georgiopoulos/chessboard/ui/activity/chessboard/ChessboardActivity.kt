@@ -1,15 +1,18 @@
 package gr.georgiopoulos.chessboard.ui.activity.chessboard
 
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import com.afollestad.materialdialogs.DialogAction
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import gr.georgiopoulos.chessboard.R
 import gr.georgiopoulos.chessboard.model.Possition
 import gr.georgiopoulos.chessboard.model.Tile
-import gr.georgiopoulos.chessboard.ui.custom.BoardView
+import gr.georgiopoulos.chessboard.ui.custom.boardView.BoardView
 import kotlinx.android.synthetic.main.activity_chessboard.*
 import kotlinx.android.synthetic.main.layout_toolbar.*
 import java.util.*
@@ -19,20 +22,19 @@ class ChessboardActivity : AppCompatActivity() {
     companion object {
         const val DEFAULT_DIMENSION = 8
         const val POST_DELAY_ANIMATION = 200L
+        const val CHESS_DIMENSION = "chess dimension"
     }
 
-    private var chessBoardDimension =
-        DEFAULT_DIMENSION
-    private var chessboard = Array(DEFAULT_DIMENSION) { arrayOfNulls<Tile>(
-        DEFAULT_DIMENSION
-    ) }
+    private var chessboard = Array(DEFAULT_DIMENSION) { arrayOfNulls<Tile>(DEFAULT_DIMENSION) }
+    private var chessBoardDistance = DEFAULT_DIMENSION
     private var queue: Queue<Tile> = LinkedList()
-    private var materialDialog: MaterialDialog? = null
     private var knightPos: Possition? = null
     private var targetPos: Possition? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        chessBoardDistance = intent?.getIntExtra(CHESS_DIMENSION, DEFAULT_DIMENSION) ?: DEFAULT_DIMENSION
+        chessboard = Array(chessBoardDistance) { arrayOfNulls<Tile>(chessBoardDistance) }
         setContentView(R.layout.activity_chessboard)
         //Populate the chessboard with position values as unreachable
         populateChessBoard()
@@ -42,7 +44,7 @@ class ChessboardActivity : AppCompatActivity() {
     private fun initLayout() {
         closeImageView?.setOnClickListener { onBackPressed() }
         refreshImageView?.setOnClickListener { reset() }
-        val chessBoardDistance = 8
+        chessboardDimensionImageView?.setOnClickListener { showSelectDimensionDialog() }
         chessBoardView?.setDimension(chessBoardDistance)
         chessBoardView?.setBoardListener(object : BoardView.BoardListener {
             override fun onClickPiece(pos: Possition?, isSameLast: Boolean) {
@@ -89,24 +91,9 @@ class ChessboardActivity : AppCompatActivity() {
                                     knightPath.add(Possition(it.x, it.y))
                                 }
 
-                                Handler().postDelayed({
-                                    chessBoardView?.movePiece(knightPath.reversed())
-                                },
-                                    POST_DELAY_ANIMATION
-                                )
-
-                                Handler().postDelayed({
-                                    resetTarget()
-                                },
-                                    POST_DELAY_ANIMATION
-                                )
-
-
+                                Handler().postDelayed({ chessBoardView?.movePiece(knightPath.reversed()) }, POST_DELAY_ANIMATION)
                             } else {
-                                showErrorDialog("Oups", "The knight can not reach end position in 3 steps", closeListener = MaterialDialog.SingleButtonCallback { materialDialog: MaterialDialog, dialogAction: DialogAction ->
-                                    resetTarget()
-                                    materialDialog.dismiss()
-                                })
+                                showErrorDialog(R.string.error_title, R.string.error_message_steps) { resetTarget() }
                             }
                         } else {
                             // perform BFS on this Pos if it is not already visited
@@ -114,7 +101,7 @@ class ChessboardActivity : AppCompatActivity() {
                         }
                     }
                     if (tile.depth == Integer.MAX_VALUE) {
-                        showErrorDialog("Oups", "End position is not reachable for the knight")
+                        showErrorDialog(R.string.error_title, R.string.error_message_not_reachable) {}
                     }
                 }
             }
@@ -124,50 +111,59 @@ class ChessboardActivity : AppCompatActivity() {
     private fun resetTarget() {
         targetPos?.let {
             chessBoardView.removePiece(it.i, it.j)
-            chessboard = Array(chessBoardDimension) { arrayOfNulls<Tile>(chessBoardDimension) }
+            chessboard = Array(chessBoardDistance) { arrayOfNulls<Tile>(chessBoardDistance) }
             populateChessBoard()
             queue = LinkedList()
             targetPos = null
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        materialDialog?.dismiss()
-    }
-
 
     private fun reset() {
         knightPos?.let {
             chessBoardView?.removePiece(it.i, it.j)
             knightPos = null
         }
-        targetPos?.let {
-            chessBoardView.removePiece(it.i, it.j)
-            chessboard = Array(chessBoardDimension) { arrayOfNulls<Tile>(chessBoardDimension) }
-            populateChessBoard()
-            queue = LinkedList()
-            targetPos = null
+        resetTarget()
+    }
+
+    private fun showSelectDimensionDialog() {
+        val chessboardDimens: ArrayList<Int> = arrayListOf()
+        for (i in 6..16) {
+            chessboardDimens.add(i)
+        }
+        val dialogItems: ArrayList<String> = arrayListOf()
+        chessboardDimens.map {
+            dialogItems.add(it.toString())
+        }
+
+        MaterialDialog(this).show {
+            title(R.string.select_dimension_title)
+            listItemsSingleChoice(items = dialogItems) { dialog, index, text ->
+                chessBoardDistance = chessboardDimens[index]
+                intent.putExtra(CHESS_DIMENSION, chessBoardDistance)
+                ActivityCompat.startActivity(this@ChessboardActivity, intent, ActivityOptionsCompat
+                        .makeCustomAnimation(this@ChessboardActivity, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .toBundle())
+                finish()
+            }
         }
     }
 
-    fun showErrorDialog(
-            error: String = "",
-            errorDescription: String = "",
-            closeListener: MaterialDialog.SingleButtonCallback? = null
+    private fun showErrorDialog(
+            @StringRes error: Int,
+            @StringRes errorDescription: Int,
+            dialogAction: () -> Unit
     ) {
-        val materialBuilder = MaterialDialog.Builder(this)
-                .title(error)
-                .content(errorDescription)
-        closeListener?.let {
-            materialBuilder.positiveText(getString(android.R.string.ok))
-            materialBuilder.onPositive(closeListener)
-            materialBuilder.positiveColor(Color.BLACK)
+        MaterialDialog(this).show {
+            cancelable(true)
+            cancelOnTouchOutside(true)
+            title(error)
+            message(errorDescription)
+            positiveButton(text = getString(android.R.string.ok)) {
+                dialogAction
+            }
+            lifecycleOwner(this@ChessboardActivity)
         }
-
-        materialDialog?.dismiss()
-        materialDialog = materialBuilder.build()
-        materialDialog?.show()
     }
 
     /**
@@ -193,7 +189,6 @@ class ChessboardActivity : AppCompatActivity() {
                         }
                     }
                 }
-
             }
         }
     }
@@ -202,21 +197,22 @@ class ChessboardActivity : AppCompatActivity() {
      * Populate initial chessboard values
      */
     private fun populateChessBoard() {
-        for (i in 0 until chessboard.size) {
-            for (j in 0 until chessboard[0].size) {
+        val size = chessBoardDistance
+        for (i in 0 until size) {
+            for (j in 0 until size) {
                 chessboard[i][j] = Tile(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)
             }
         }
     }
 
     private fun inRange(x: Int, y: Int): Boolean {
-        return x in 0..7 && 0 <= y && y < 8
+        return x in 0 until chessBoardDistance-1 && 0 <= y && y < chessBoardDistance
     }
 
     /**
      * Check if this is a valid jump or position for Knight based on its current location
      */
-    fun isValid(current: Tile, next: Tile): Boolean {
+    private fun isValid(current: Tile, next: Tile): Boolean {
         // Use Pythagoras theorem to ensure that a move makes a right-angled triangle with sides of 1 and 2. 1-squared + 2-squared is 5.
         val deltaR = next.x - current.x
         val deltaC = next.y - current.y

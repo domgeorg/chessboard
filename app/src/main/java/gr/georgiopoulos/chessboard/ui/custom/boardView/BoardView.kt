@@ -1,4 +1,4 @@
-package gr.georgiopoulos.chessboard.ui.custom
+package gr.georgiopoulos.chessboard.ui.custom.boardView
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -10,6 +10,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -19,8 +20,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import gr.georgiopoulos.chessboard.R
 import gr.georgiopoulos.chessboard.model.Possition
-
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -83,7 +83,7 @@ class BoardView : GridLayout {
 
     private var alreadyCreated = false
 
-    private val pieceQueues = ArrayList<PieceQueue>()
+    private var pieceQueues = ArrayList<PieceQueue>()
 
     constructor(context: Context) : super(context) {
         val arrayOfNulls: Array<View?> = arrayOfNulls(dimension ?: BOARD_DIMENSION)
@@ -101,10 +101,10 @@ class BoardView : GridLayout {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
-        context,
-        attrs,
-        defStyleAttr,
-        defStyleRes
+            context,
+            attrs,
+            defStyleAttr,
+            defStyleRes
     ) {
         initVar(context, attrs)
     }
@@ -114,8 +114,8 @@ class BoardView : GridLayout {
         val parentHeight = MeasureSpec.getSize(height)
         this.setMeasuredDimension(parentWidth, parentHeight)
         super.onMeasure(
-            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
         )
         dimm = parentWidth
         if (!alreadyCreated) {
@@ -129,18 +129,16 @@ class BoardView : GridLayout {
         }
     }
 
+
     private fun initVar(context: Context, attrs: AttributeSet) {
         val a = context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.BoardView,
-            0, 0
+                attrs,
+                R.styleable.BoardView,
+                0, 0
         )
 
         try {
-            dimension = a.getInt(
-                R.styleable.BoardView_dimension,
-                BOARD_DIMENSION
-            )
+            dimension = a.getInt(R.styleable.BoardView_dimension, BOARD_DIMENSION)
             markedTilesEnabled = a.getBoolean(R.styleable.BoardView_tileMarkingEnabled, false)
             isClickEnabled = a.getBoolean(R.styleable.BoardView_clickEnabled, true)
             darkTile = a.getDrawable(R.styleable.BoardView_darkTileImage)
@@ -160,6 +158,9 @@ class BoardView : GridLayout {
         this.dimension = dimension
         val arrayOfNulls: Array<View?> = arrayOfNulls(dimension)
         piecesMatrix = Array(dimension) { arrayOfNulls }
+        alreadyCreated = false
+        pieceQueues = ArrayList<PieceQueue>()
+        requestLayout()
     }
 
     fun getDimension(): Int {
@@ -474,7 +475,8 @@ class BoardView : GridLayout {
     }
 
     private fun getTile(pos: Possition): View {
-        return getChildAt(pos.i * 8 + pos.j)
+        val size = dimension ?: BOARD_DIMENSION
+        return getChildAt(pos.i * size + pos.j)
     }
 
 

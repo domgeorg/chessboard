@@ -40,6 +40,16 @@
             android:textSize="@dimen/common_text_eighteen_sp" />
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/chessboardDimensionImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/refreshImageView"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/common_ten_dp"
+            android:src="@drawable/vector_chessboard_size" />
+
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/refreshImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
