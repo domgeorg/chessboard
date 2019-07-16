@@ -1,8 +1,7 @@
-# chessboard
+ # chessboard
+ ![chessboard logo](https://github.com/domgeorg/chessboard/blob/master/app/src/main/res/mipmap-xhdpi/ic_launcher.png)
 
-![chessboard screenshot](https://github.com/domgeorg/chessboard/blob/master/screenshot.png)
-
-Given a square chessboard of N x N size, the position of Knight and position of a target is given. We need to find out minimum steps a Knight will take to reach the target position.
+Given a square chessboard of N x N size, the position of Knight and position of a target is given. We need to find out minimum steps the Knight will take to reach the target position.
 
 Shortest Path in almost all cases is a breadth first search implementation. (BFS). 
 
@@ -20,3 +19,7 @@ I have used pythagorean theorem where a move makes a right angle triangle of one
 2. To track back shortest path: 
 The chess board is created with Position Object which consists of X and Y co-ordinates and depth variable which says deep the location is from the source location. 
 X and Y objects are the co-ordinates of the source location from where the jump was made. 
+
+[video example](https://www.youtube.com/watch?v=IkwmVB5Xxlc)
+
+![chessboard screenshot](https://github.com/domgeorg/chessboard/blob/master/screenshot.png)
